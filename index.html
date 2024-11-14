@@ -212,13 +212,13 @@
 	@media (max-width: 420px) {
             header {
                 justify-content: flex-start; /* Align header to the left */
-        	padding-left: 1rem; /* Add some left padding for better spacing */
-        	padding-right: 1rem;
+        	/*padding-left: 1rem;  Add some left padding for better spacing 
+        	padding-right: 1rem;*/
 	    }
 
 	    header nav{
-		    display: block; /* Stack items vertically */
-        	    text-align: left;
+		display: flex; 
+        	text-align: center;
 	    }
             .overlay-text h1 {
 		font-size: 1rem;
@@ -482,7 +482,6 @@
                         <th>Person 1</th>
                         <th>Person 2</th>
                         <th>Person 3</th>
-                        <th>Person 4</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -491,49 +490,43 @@
                         <td><input type="radio" name="person1[]" value="Oil Relaxation"></td>
                         <td><input type="radio" name="person2[]" value="Oil Relaxation"></td>
                         <td><input type="radio" name="person3[]" value="Oil Relaxation"></td>
-                        <td><input type="radio" name="person4[]" value="Oil Relaxation"></td>
                     </tr>
                     <tr>
                         <td>Deep Tissue</td>
                         <td><input type="radio" name="person1[]" value="Deep Tissue"></td>
                         <td><input type="radio" name="person2[]" value="Deep Tissue"></td>
                         <td><input type="radio" name="person3[]" value="Deep Tissue"></td>
-                        <td><input type="radio" name="person4[]" value="Deep Tissue"></td>
+
                     </tr>
                     <tr>
                         <td>Aromatherapy</td>
                         <td><input type="radio" name="person1[]" value="Aromatherapy"></td>
                         <td><input type="radio" name="person2[]" value="Aromatherapy"></td>
                         <td><input type="radio" name="person3[]" value="Aromatherapy"></td>
-                        <td><input type="radio" name="person4[]" value="Aromatherapy"></td>
                     </tr>
                     <tr>
                         <td>Foot Massage</td>
                         <td><input type="radio" name="person1[]" value="Footmassage"></td>
                         <td><input type="radio" name="person2[]" value="Footmassage"></td>
                         <td><input type="radio" name="person3[]" value="Footmassage"></td>
-                        <td><input type="radio" name="person4[]" value="Footmassage"></td>
                     </tr>
                     <tr>
                         <td>Coconut Oil Massage</td>
                         <td><input type="radio" name="person1[]" value="Coconutoil"></td>
                         <td><input type="radio" name="person2[]" value="Coconutoil"></td>
                         <td><input type="radio" name="person3[]" value="Coconutoil"></td>
-                        <td><input type="radio" name="person4[]" value="Coconutoil"></td>
                     </tr>
                     <tr>
                         <td>Head-Shoulder-Neck </td>
                         <td><input type="radio" name="person1[]" value="Headnshoulder"></td>
                         <td><input type="radio" name="person2[]" value="Headnshoulder"></td>
                         <td><input type="radio" name="person3[]" value="Headnshoulder"></td>
-                        <td><input type="radio" name="person4[]" value="Headnshoulder"></td>
                     </tr>
                     <tr>
                         <td>Traditional Thai</td>
                         <td><input type="radio" name="person1[]" value="Traditionalthai"></td>
                         <td><input type="radio" name="person2[]" value="Traditionalthai"></td>
                         <td><input type="radio" name="person3[]" value="Traditionalthai"></td>
-                        <td><input type="radio" name="person4[]" value="Traditionalthai"></td>
                     </tr>
                 </tbody>
             </table>
@@ -614,7 +607,6 @@
                 person1[]: formData.getAll('person1[]'),
                 person2[]: formData.getAll('person2[]'),
                 person3[]: formData.getAll('person3[]'),
-                person4[]: formData.getAll('person4[]'),
             },
             date: formData.get('date'),
             time: formData.get('time'),
