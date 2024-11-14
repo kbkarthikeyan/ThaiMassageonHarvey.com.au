@@ -23,12 +23,18 @@
         header {
 		background-color: #D2BBAA;
 		text-align: center;
-		padding: 1rem;
+		padding: 0.25rem;
 		position: fixed;
 		top: 0;
 		width: 100%;
 		z-index: 1000;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		display: flex;
+		justify-content: center;
+        }
+        header nav {
+        	display: flex;
+        	gap: 0.75rem;
         }
 
         footer {
@@ -38,26 +44,16 @@
         }
 
         section {
-		padding: 2rem;
-		min-height: 100vh;
+		min-height: 50vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		background-color: rgba(230, 230, 250, 0.1);
-		margin-top: 60px;
+		margin-top: 90px;
         }
-        .intro{
-		position: relative;
-		height: 20vh;
-		border: 1px solid #f15a27;
-         
-        }
-        .intro-text{
-        	justify-content:center;
-        	float:right;
-        }
-	.overlay-text h1 {
+
+     	.overlay-text h1 {
 		font-size: 2rem;
 		font-weight: bold;
 		margin: 0;
@@ -84,27 +80,22 @@
 		font-weight: bold;
 		transition: background-color 0.3s ease;
         }
-	#about {
+	.about-container {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		padding: 2rem;
-		width: 100%;
-		max-width: 1200px; /* optional for alignment within a container */
-		margin: 0 auto; /* centers the section if in a wider container */
+		text-align: center;
+		max-width: 992px;
+		
 	}
-
-	#about > div {
-		flex: 1;
+	.about-text {
+		flex:0 0 50%;
+		margin: auto;
+		padding: 10px;
 	}
-
-	#about img {
-		width: 80%;
-		max-width: 300px;
-		height: auto;
-		border-radius: 8px;
-	}
+	.about-image {
+		flex:30%
+		}
+	
 	.testimonial-container {
 		display: flex;
 		overflow: hidden;
@@ -140,7 +131,6 @@
 		gap: 1.5rem; /* Space between grid items */
 		margin-top: 2rem;
 	}
-
 	.service-item {
 		padding: 1rem;
 		border: 1px solid #ddd;
@@ -148,22 +138,14 @@
 		text-align: justified;
 		background-color: #f9f9f9;
 	}
-
-	/* Responsive Design for Smaller Screens */
-	@media (max-width: 992px) {
-		.service-list {
-		grid-template-columns: repeat(2, 1fr); /* Switch to 2 columns on medium 		screens */
-		}
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		border: none;
 	}
 
-	@media (max-width: 600px) {
-		.service-list {
-		grid-template-columns: 1fr; /* Switch to 1 column on small screens */
-		}
-	}
-
-        button:hover, .button:hover {
-            background-color: #2B0F2B;
+	button:hover, .button:hover {
+            	background-color: #2B0F2B;
         }
         .nav-link {
             padding: 10px;
@@ -198,28 +180,70 @@
             font-size: 48px;
         }
         .p {text-align: center;}
-
-        /* Embedded map container (hidden by default) */
-        #map-container {
-            display: none;
-            margin-top: 1rem;
-            text-align: center;
-        }
+        .responsive-iframe {
+    		width: 100%; /* Default to full width */
+    		max-width: 600px;
+    		height: 450px;
+	}
 
         /* Mobile optimizations */
-        @media (max-width: 768px) {
+/*	@media (max-width: 992px) {
+		.service-list {
+			grid-template-columns: repeat(2, 1fr);
+		}
+		.about-container {
+			flex-direction:column;
+		}
+		.about-image{
+			order: 1;
+			margin-bottom: 1rem
+		}
+		.about-text{
+			order: 2;
+			text-align: center;
+			padding-right: 0;
+		}
+	}*/
+
+	@media (max-width: 768px) {
             header {
-                padding: 0.5rem;
+                padding:  1 rem;
             }
+            .overlay-text h1 {
+		font-size: 1.25rem;
+		font-weight: bold;
+		margin-bottom: 10px;
+		}
+		
+   	    .service-list {
+			grid-template-columns: 1fr;
+		}
+		
+	    .responsive-iframe {
+        		width: 100%; /* Full width on mobile */
+        		height: 300px; /* Reduce height for better fit on mobile */
+    	    }
+    	    
             section {
                 padding: 1rem;
             }
+            
+            .about-container {
+            	flex-direction:column;
+            }
+            
             .nav-link {
                 display: block;
                 margin: 0.5rem 0;
+     	    
+     	    #booking table {
+	            display: block;
+	            overflow-x: auto;
+	            white-space: nowrap;
+       		    width: 100%;
             }
-        }
-        
+     	}
+
     </style>
 </head>
 <body>
@@ -245,20 +269,23 @@
 </section>
     
 <!-- About Section -->
-<section id="about" style="display: flex; align-items: center; justify-content: space-between; padding: 2rem; width: 100%;">
+<section id="about">
+
 <!-- Text Section -->
-	    <div style="flex: 1; padding-right: 2rem; text-align: justify;font-family: Garamond;font-size: 1.2rem;">
+	    <div class="about-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+		<div class="about-text" style="text-align: justify; font-size: 1.2rem;" >
 		<p>At Thai Massage on Harvey, we pride ourselves on delivering truly exceptional relaxation and therapeutic services, designed to meet your unique needs with care and precision.
 	Discover the art of relaxation at Thai Massage on Harvey, where our expert therapist is renowned for her extraordinary skills and dedication to client satisfaction. With over a decade of experience as a licensed massage therapist from Thailand, she has earned a loyal clientele who return time and again for her remarkable ability to relieve tension and restore balance. Known for her dynamic pressure techniques, she carefully adjusts each massage to target specific muscles and release even the most stubborn knots, offering tailored relief that addresses your individual needs.</p>
 	<p>Our customizable massage packages are designed with flexibility to suit your personal preferences and goals. Whether you're looking for deep therapeutic work or gentle relaxation, we create the perfect treatment just for you.</p>
 	<p>Your well-being is always our top priority. Our soothing treatment room is meticulously crafted to create an inviting, tranquil space where you can unwind, let go, and escape the demands of daily life.</p>
-
 	    </div>
     
-<!-- Image Section -->
-	    <div style="flex: 1; display: flex; justify-content: center;">
+<!-- Image Section -->	    
+	    <div class="about-image">
 		<img src="about_us.png" alt="Aromatherapy Oils" style="width:100%; max-width: 370px; height: auto; border-radius: 8px;">
 	    </div>
+	 </div>   
+	    
 </section>
    
  <!-- Services Section -->
@@ -406,8 +433,7 @@
         <p style="margin: 0;"><strong>Address:</strong> 4 Harvey Cct, Mawson Lakes, SA 5095, Australia.</p>
         <p style="margin: 0;">(Heaps of street parking available)</p>
         <p> </p>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3275.918791382197!2d138.6104499!3d-34.8079849!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ab0b77417992485%3A0xe00937fcdcc1f914!2sMassage%20On%20Harvey!5e0!3m2!1sen!2sit!4v1731354309631!5m2!1sen!2sit" width="600" height="450" style="border:1;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        
+        <iframe class="responsive-iframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3275.918791382197!2d138.6104499!3d-34.8079849!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ab0b77417992485%3A0xe00937fcdcc1f914!2sMassage%20On%20Harvey!5e0!3m2!1sen!2sit!4v1731354309631!5m2!1sen!2sit" width="600" height="450" style="border:1;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         <p> </p>
         <p style="margin: 0;"><strong>Phone:</strong> 0401 818 848.</p>
         <p style="margin: 0;">(Upon appointments only and no walk-ins please)</p>
@@ -436,7 +462,7 @@
         <div>
             <label>Select Services for Each Person:</label>
             
-            <table border="1" cellspacing="0" cellpadding="8" style="margin-top: 10px; width: 100%; text-align: center;">
+            <table border="1" cellspacing="0" cellpadding="8" style="margin-top: 10px; width: 100%; max-width: 100%; text-align: center; border-collapse: collapse;">
                 <thead>
                     <tr>
                         <th>Service</th>
@@ -555,7 +581,7 @@
             <label for="phone">Phone Number:</label>
             <input type="tel" placeholder="0412345678" id="phone" name="phone" required>
         </div>
-        <div style="margin-top:20px;">
+        <div style="margin-top:20px; margin-bottom:20px;">
         	<button type="submit">Submit</button>
 		<button type="reset">Reset</button>	
     	</div>
