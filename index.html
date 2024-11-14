@@ -143,6 +143,10 @@
 		width: 100%;
 		border: none;
 	}
+	.table-container {
+		width: 100%;
+		overflow-x:auto;
+	}
 
 	button:hover, .button:hover {
             	background-color: #2B0F2B;
@@ -207,10 +211,15 @@
 
 	@media (max-width: 420px) {
             header {
-                gap: 0.1rem;
-            
+                justify-content: flex-start; /* Align header to the left */
+        	padding-left: 1rem; /* Add some left padding for better spacing */
+        	padding-right: 1rem;
 	    }
-		
+
+	    header nav{
+		    display: block; /* Stack items vertically */
+        	    text-align: left;
+	    }
             .overlay-text h1 {
 		font-size: 1rem;
 		font-weight: bold;
@@ -237,12 +246,14 @@
             .nav-link {
                 display: block;
                 margin: 0.5rem 0;
-     	    
-     	    #booking table {
+     	    .table-container {
+		    overflow-x: auto;
+		    -webkit-overflow-scrolling: touch;
+	    }
+     	    table {
 	            /*table-layout: fixed;*/
-	            overflow-x: auto;
+	            min-width: 420px;
 	           /* word-wrap: break;*/
-       		    width: 100%;
             }
      	}
 
@@ -463,8 +474,8 @@
         <!-- Service Selection for Multiple People -->
         <div>
             <label>Select Services for Each Person:</label>
-            
-            <table border="0" cellspacing="0" cellpadding="8" style="margin-top: 10px; width: 100%; max-width: 100%; text-align: center; border-collapse: collapse;">
+            <div class="table-container">
+            <table border="0" cellspacing="0" cellpadding="8" style="width: 100%; text-align: center;">
                 <thead>
                     <tr>
                         <th>Service</th>
@@ -527,6 +538,7 @@
                 </tbody>
             </table>
         </div>
+	</div>
         <p> </p>
         <!-- Date, Time, and Duration Selection -->
         <div style="width: 500px;margin: auto;margin-top:20px;">
