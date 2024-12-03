@@ -601,7 +601,7 @@
         const formData = new FormData(event.target);
         const bookingDetails = {
             services: {
-                person1[]: formData.getAll('person1[]'),
+                person1: formData.getAll('person1[]'),
             },
             date: formData.get('date'),
             time: formData.get('time'),
