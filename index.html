@@ -588,6 +588,7 @@
         	<button type="submit">Submit</button>
 		<button type="reset">Reset</button>	
     	</div>
+	<div id="result"></div>
     </form>
 </div>	
 </section>
@@ -597,8 +598,11 @@
 
     document.getElementById('booking-form').addEventListener('submit', function(event) {
         event.preventDefault();
+	const form = event.target;
+	const result = document.getElementById("result");
 
-        const formData = new FormData(event.target);
+	result.innerHTML="Please wait...";
+        const formData = new FormData(form);
         const bookingDetails = {
             services: {
                 person1: formData.getAll('person1[]'),
@@ -610,7 +614,7 @@
             email: formData.get('email'),
             phone: formData.get('phone')
         };
-	result.innerHTML="Please wait...";
+	
         // Email handling simulation
         fetch("https://api.web32forms.com/submit", {
         method: "POST", body: bookingDetails
