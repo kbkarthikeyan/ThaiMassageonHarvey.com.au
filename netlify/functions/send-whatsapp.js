@@ -32,16 +32,20 @@ function httpsRequest(url, options, data) {
   });
 }
 
-// Send WhatsApp message via WhatsApp Business API
+// Send WhatsApp message via WhatsApp Business API using template
 async function sendWhatsAppMessage(phoneNumberId, accessToken, toPhone, message) {
-  const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
+  const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
 
+  // In test mode, use template message instead of custom text
   const payload = JSON.stringify({
     messaging_product: 'whatsapp',
     to: toPhone,
-    type: 'text',
-    text: {
-      body: message
+    type: 'template',
+    template: {
+      name: 'hello_world',
+      language: {
+        code: 'en_US'
+      }
     }
   });
 
@@ -180,28 +184,18 @@ exports.handler = async (event, context) => {
       `We look forward to seeing you!\n` +
       `If you need to reschedule, please reply to this message. 🙏`;
 
-    // Send WhatsApp to OWNER
-    console.log('Sending to owner:', OWNER_PHONE);
-    const ownerResult = await sendWhatsAppMessage(
-      PHONE_NUMBER_ID,
-      ACCESS_TOKEN,
-      OWNER_PHONE,
-      ownerMessage
-    );
-    console.log('Owner result:', JSON.stringify(ownerResult));
-
-    // Send WhatsApp to CLIENT
-    console.log('Sending to client:', clientPhoneInternational);
+    // Send WhatsApp to CLIENT ONLY (owner gets email notification)
+    console.log('Sending WhatsApp to client:', clientPhoneInternational);
     const clientResult = await sendWhatsAppMessage(
       PHONE_NUMBER_ID,
       ACCESS_TOKEN,
       clientPhoneInternational,
       clientMessage
     );
-    console.log('Client result:', JSON.stringify(clientResult));
+    console.log('Client WhatsApp result:', JSON.stringify(clientResult));
 
-    // Check results
-    if (ownerResult.success && clientResult.success) {
+    // Check result
+    if (clientResult.success) {
       return {
         statusCode: 200,
         headers: {
@@ -210,7 +204,7 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({
           success: true,
-          message: 'WhatsApp messages sent successfully to both owner and client!'
+          message: 'Booking confirmed! WhatsApp notification sent to client.'
         })
       };
     } else {
@@ -222,13 +216,8 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({
           success: false,
-          message: 'Booking received but some messages failed to send.',
-          ownerSent: ownerResult.success,
-          clientSent: clientResult.success,
-          errors: {
-            owner: ownerResult.error,
-            client: clientResult.error
-          }
+          message: 'Booking received but WhatsApp notification failed.',
+          error: clientResult.error || clientResult.data
         })
       };
     }
