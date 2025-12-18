@@ -83,14 +83,17 @@ function formatDate(dateStr) {
   }
 }
 
-// Convert Australian phone to international format
+// Convert phone to international format
 function formatPhoneInternational(phone) {
-  phone = phone.replace(/[\s\-]/g, '');
+  // Remove spaces, hyphens, and + sign
+  phone = phone.replace(/[\s\-\+]/g, '');
+
+  // If starts with 0, it's Australian mobile - convert to international
   if (phone.startsWith('0')) {
     return '61' + phone.substring(1);
-  } else if (!phone.startsWith('61')) {
-    return '61' + phone;
   }
+
+  // Otherwise, assume it's already in international format
   return phone;
 }
 
