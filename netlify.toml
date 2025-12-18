@@ -5,8 +5,6 @@
 [functions]
   # Directory where Netlify functions are located
   directory = "netlify/functions"
-  # Python runtime for serverless functions
-  node_bundler = "esbuild"
 
 [[redirects]]
   # Redirect API calls to serverless function
