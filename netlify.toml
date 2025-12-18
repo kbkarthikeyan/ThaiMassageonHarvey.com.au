@@ -1,0 +1,24 @@
+[build]
+  # No build command needed for static site
+  publish = "."
+
+[functions]
+  # Directory where Netlify functions are located
+  directory = "netlify/functions"
+  # Python runtime for serverless functions
+  node_bundler = "esbuild"
+
+[[redirects]]
+  # Redirect API calls to serverless function
+  from = "/api/send-whatsapp"
+  to = "/.netlify/functions/send_whatsapp"
+  status = 200
+  force = true
+
+[[headers]]
+  # CORS headers for API endpoint
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"

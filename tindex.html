@@ -630,6 +630,90 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
     };
 
     setInterval(scrollTestimonials, 3000); // Adjust the interval as needed
+
+    // WhatsApp Booking Notification via Netlify Function
+    document.getElementById('booking-form').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        // Get form values
+        const service = document.querySelector('input[name="person1[]"]:checked')?.value || 'Not selected';
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const duration = document.getElementById('duration').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+
+        // Validate that a service is selected
+        if (service === 'Not selected') {
+            alert('Please select a service type');
+            return;
+        }
+
+        // Show loading message
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<p style="color: blue; margin-top: 1rem;">⏳ Sending WhatsApp notifications...</p>';
+
+        // Prepare booking data
+        const bookingData = {
+            service: service,
+            date: date,
+            time: time,
+            duration: duration,
+            name: name,
+            email: email,
+            phone: phone
+        };
+
+        try {
+            // Call Netlify serverless function to send WhatsApp messages
+            const response = await fetch('/api/send-whatsapp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                // Success - WhatsApp messages sent
+                resultDiv.innerHTML =
+                    '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking confirmed! WhatsApp messages sent successfully to you and the owner.</p>';
+
+                // Also submit to web3forms for email backup
+                const formData = new FormData(this);
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    this.reset();
+                    resultDiv.innerHTML = '';
+                }, 3000);
+
+            } else {
+                // Error sending WhatsApp
+                resultDiv.innerHTML =
+                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking received but WhatsApp notification failed. We will contact you via email.</p>';
+
+                // Submit to web3forms as fallback
+                const formData = new FormData(this);
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.innerHTML =
+                '<p style="color: red; margin-top: 1rem;">❌ Error submitting booking. Please call us at 0401 818 848.</p>';
+        }
+    });
 </script>
 </body>
 </html>
