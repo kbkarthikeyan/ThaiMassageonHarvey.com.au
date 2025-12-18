@@ -132,6 +132,10 @@ exports.handler = async (event, context) => {
     const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
     const OWNER_PHONE = process.env.OWNER_PHONE || '393495565607';
 
+    console.log('Phone Number ID:', PHONE_NUMBER_ID ? 'Set' : 'Missing');
+    console.log('Access Token:', ACCESS_TOKEN ? 'Set (length: ' + ACCESS_TOKEN.length + ')' : 'Missing');
+    console.log('Owner Phone:', OWNER_PHONE);
+
     if (!PHONE_NUMBER_ID || !ACCESS_TOKEN) {
       return {
         statusCode: 500,
@@ -174,20 +178,24 @@ exports.handler = async (event, context) => {
       `If you need to reschedule, please reply to this message. 🙏`;
 
     // Send WhatsApp to OWNER
+    console.log('Sending to owner:', OWNER_PHONE);
     const ownerResult = await sendWhatsAppMessage(
       PHONE_NUMBER_ID,
       ACCESS_TOKEN,
       OWNER_PHONE,
       ownerMessage
     );
+    console.log('Owner result:', JSON.stringify(ownerResult));
 
     // Send WhatsApp to CLIENT
+    console.log('Sending to client:', clientPhoneInternational);
     const clientResult = await sendWhatsAppMessage(
       PHONE_NUMBER_ID,
       ACCESS_TOKEN,
       clientPhoneInternational,
       clientMessage
     );
+    console.log('Client result:', JSON.stringify(clientResult));
 
     // Check results
     if (ownerResult.success && clientResult.success) {
