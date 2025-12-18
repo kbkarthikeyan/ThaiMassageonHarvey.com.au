@@ -133,7 +133,7 @@ exports.handler = async (event, context) => {
     // Get WhatsApp API credentials from environment variables
     const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
     const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
-    const OWNER_PHONE = process.env.OWNER_PHONE || '393495565607';
+    const OWNER_PHONE = (process.env.OWNER_PHONE || '393495565607').replace(/[\s\-\+]/g, '');
 
     console.log('Phone Number ID:', PHONE_NUMBER_ID ? 'Set' : 'Missing');
     console.log('Access Token:', ACCESS_TOKEN ? 'Set (length: ' + ACCESS_TOKEN.length + ')' : 'Missing');
