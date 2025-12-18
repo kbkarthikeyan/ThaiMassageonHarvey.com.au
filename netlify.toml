@@ -9,7 +9,7 @@
 [[redirects]]
   # Redirect API calls to serverless function
   from = "/api/send-whatsapp"
-  to = "/.netlify/functions/send_whatsapp"
+  to = "/.netlify/functions/send-whatsapp"
   status = 200
   force = true
 
