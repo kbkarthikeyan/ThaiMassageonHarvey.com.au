@@ -1,12 +1,13 @@
 /**
- * Twilio Function: Send WhatsApp Booking Confirmation
+ * Twilio Function: Send WhatsApp Booking Notification to OWNER
  *
  * Deploy this in Twilio Console → Functions and Assets → Services
  *
  * Path: /send-booking
  *
  * Environment Variables needed in Twilio:
- * - WHATSAPP_FROM: Your approved WhatsApp number (e.g., whatsapp:+61401818848)
+ * - WHATSAPP_FROM: Your Twilio WhatsApp number (e.g., whatsapp:+15077085431)
+ * - OWNER_PHONE: Owner's WhatsApp number (e.g., +393495565607)
  */
 
 exports.handler = async function(context, event, callback) {
@@ -47,50 +48,34 @@ exports.handler = async function(context, event, callback) {
       day: 'numeric'
     });
 
-    // Format client phone to international format with WhatsApp prefix
-    let clientPhone = phone.replace(/[\s\-]/g, '');
-    if (clientPhone.startsWith('0')) {
-      clientPhone = '+61' + clientPhone.substring(1);
-    } else if (!clientPhone.startsWith('+')) {
-      // If already international format without +
-      if (clientPhone.startsWith('61')) {
-        clientPhone = '+' + clientPhone;
-      } else if (clientPhone.startsWith('3')) {
-        // Italian or other international
-        clientPhone = '+' + clientPhone;
-      } else {
-        // Assume Australian
-        clientPhone = '+61' + clientPhone;
-      }
-    }
+    // Get owner phone from environment variable
+    const ownerPhone = context.OWNER_PHONE || '+393495565607';
 
-    // Create WhatsApp message for CLIENT
-    const clientMessage = `✅ Booking Confirmed!\n\n` +
-      `Thank you ${name} for choosing Thai Massage on Harvey!\n\n` +
-      `📋 Your booking details:\n` +
+    // Create WhatsApp message for OWNER (booking alert)
+    const ownerMessage = `🆕 NEW BOOKING ALERT!\n\n` +
+      `👤 Client: ${name}\n` +
+      `📧 Email: ${email}\n` +
+      `📱 Phone: ${phone}\n\n` +
       `💆 Service: ${service}\n` +
       `📅 Date: ${formattedDate}\n` +
       `⏰ Time: ${time}\n` +
       `⏱️ Duration: ${duration} minutes\n\n` +
-      `📍 Location: 4 Harvey Cct, Mawson Lakes, SA 5095\n` +
-      `📞 Contact: 0401 818 848\n\n` +
-      `We look forward to seeing you!\n` +
-      `If you need to reschedule, please reply to this message. 🙏`;
+      `Please confirm this appointment with the client.`;
 
-    console.log('Sending WhatsApp to:', clientPhone);
+    console.log('Sending WhatsApp booking alert to owner:', ownerPhone);
 
-    // Send WhatsApp message to CLIENT
+    // Send WhatsApp message to OWNER
     const message = await client.messages.create({
-      from: context.WHATSAPP_FROM, // Your approved WhatsApp sender (set in Environment Variables)
-      to: `whatsapp:${clientPhone}`,
-      body: clientMessage
+      from: context.WHATSAPP_FROM, // Twilio WhatsApp number (e.g., whatsapp:+15077085431)
+      to: `whatsapp:${ownerPhone}`,
+      body: ownerMessage
     });
 
     console.log('Message sent successfully:', message.sid);
 
     response.setBody({
       success: true,
-      message: 'WhatsApp booking confirmation sent successfully!',
+      message: 'Booking alert sent to owner via WhatsApp!',
       messageSid: message.sid
     });
 
