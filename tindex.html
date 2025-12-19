@@ -631,7 +631,7 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
 
     setInterval(scrollTestimonials, 3000); // Adjust the interval as needed
 
-    // SMS Booking Notification - Simple Solution
+    // Twilio WhatsApp Booking Notification
     document.getElementById('booking-form').addEventListener('submit', async function(e) {
         e.preventDefault(); // Prevent default form submission
 
@@ -651,36 +651,43 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
         }
 
         const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '<p style="color: blue; margin-top: 1rem;">⏳ Submitting booking...</p>';
+        resultDiv.innerHTML = '<p style="color: blue; margin-top: 1rem;">⏳ Processing booking...</p>';
 
-        // Format the date for better readability
-        const dateObj = new Date(date);
-        const formattedDate = dateObj.toLocaleDateString('en-AU', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        // Create SMS message for owner
-        const ownerPhone = '0401818848'; // Owner's phone number
-        const smsMessage = `NEW BOOKING!\n\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nService: ${service}\nDate: ${formattedDate}\nTime: ${time}\nDuration: ${duration} min\n\nPlease confirm with client.`;
-
-        // Submit to web3forms for email notification
-        const formData = new FormData(this);
         try {
+            // Send WhatsApp notification to owner via Twilio
+            const whatsappResponse = await fetch('https://send-booking-3708.twil.io/send-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    service: service,
+                    date: date,
+                    time: time,
+                    duration: duration,
+                    name: name,
+                    email: email,
+                    phone: phone
+                })
+            });
+
+            const whatsappResult = await whatsappResponse.json();
+
+            // Also send email notification to owner
+            const formData = new FormData(this);
             await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 body: formData
             });
 
-            // Open SMS app with pre-filled message to owner
-            const smsURL = `sms:${ownerPhone}?body=${encodeURIComponent(smsMessage)}`;
-            window.location.href = smsURL;
-
             // Show success message
-            resultDiv.innerHTML =
-                '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking submitted! Please send the SMS to notify the owner.</p>';
+            if (whatsappResult.success) {
+                resultDiv.innerHTML =
+                    '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking confirmed! Owner notified via WhatsApp and email.</p>';
+            } else {
+                resultDiv.innerHTML =
+                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking submitted! Email sent but WhatsApp notification failed.</p>';
+            }
 
             // Reset form after 3 seconds
             setTimeout(() => {
