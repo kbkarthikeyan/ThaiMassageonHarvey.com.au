@@ -684,10 +684,10 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
             // Show success message
             if (whatsappResult.success) {
                 resultDiv.innerHTML =
-                    '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking confirmed! Owner notified via WhatsApp and email.</p>';
+                    '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking Confirmed!</p>';
             } else {
                 resultDiv.innerHTML =
-                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking submitted! Email sent but WhatsApp failed: ' + (whatsappResult.error || 'Unknown error') + '</p>';
+                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking received. We will contact you shortly.</p>';
             }
 
             // Reset form after 3 seconds
