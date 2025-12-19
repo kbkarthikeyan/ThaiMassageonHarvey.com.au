@@ -672,6 +672,7 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
             });
 
             const whatsappResult = await whatsappResponse.json();
+            console.log('Twilio response:', whatsappResult);
 
             // Also send email notification to owner
             const formData = new FormData(this);
@@ -686,7 +687,7 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
                     '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking confirmed! Owner notified via WhatsApp and email.</p>';
             } else {
                 resultDiv.innerHTML =
-                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking submitted! Email sent but WhatsApp notification failed.</p>';
+                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking submitted! Email sent but WhatsApp failed: ' + (whatsappResult.error || 'Unknown error') + '</p>';
             }
 
             // Reset form after 3 seconds
@@ -698,7 +699,7 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
         } catch (error) {
             console.error('Error:', error);
             resultDiv.innerHTML =
-                '<p style="color: red; margin-top: 1rem;">❌ Error submitting booking. Please call us at 0401 818 848.</p>';
+                '<p style="color: red; margin-top: 1rem;">❌ Error: ' + error.message + '<br>Please call us at 0401 818 848.</p>';
         }
     });
 </script>
