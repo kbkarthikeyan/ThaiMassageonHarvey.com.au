@@ -54,7 +54,7 @@ exports.handler = async function(context, event, callback) {
 
     // Send WhatsApp message to OWNER
     const message = await client.messages.create({
-      from: context.WHATSAPP_FROM, // Twilio WhatsApp number (e.g., whatsapp:+15077085431)
+      from: context.WHATSAPP_FROM, // Twilio WhatsApp number
       to: `whatsapp:${ownerPhone}`,
       body: ownerMessage
     });
