@@ -435,7 +435,18 @@
                         <p>"Very professional massage in a very clean tidy room. For a change someone who actually listened to my needs as I could hardly look at my car side mirror when I arrived. There was considerable improvement the next day but on day two I could turn it like an owl she really knew her stuff. I have tried all in the area but will make this one my go to, highly recommend."</p>
                 <h3>Russell Martin</h3>
             	</div>
-            
+            <div class="testimonial-box">
+            		<div class="stars">*****</div>
+            		<p>"This is my favourite Thai massage place, I do deep tissue massage regularly, and I feel pretty relaxed and peaceful every time. Penny is so much professional and friendly, I would love to highly recommend here for people who suffer from muscle pain or just want a relaxing massage. I hundred percent give 10 out of 10👍."</p>
+                <h3>Bing Liu</h3>
+            	</div>
+        	 <div class="testimonial-box">
+            		<div class="stars">*****</div>
+            		<p>"I recently had a massage session and it was incredibly relaxing and rejuvenating experience. From the moment I walked in, the ambience was calming - soft music, dim lighting, and a clean setting. Penny was professional, attentive and skilled.
+The pressure was just right - firm enough to release tight knots but still very soothing.
+Highly recommended for anyone needing dealing with muscle tension. Definitely a 5 star recommendation and I will be coming again."</p>
+                <h3>Karan Bhullar</h3>
+            	</div>
   	 	<div class="testimonial-box">
                         <div class="stars">*****</div>
                         <p>"Highly recommend! I've been going to Pen for years now,  great mix of Thai and deep tissue, always leave feeling fabulous 👌."</p>
@@ -595,7 +606,7 @@
 
 <!-- Footer -->
 <footer>
-	<p>&copy; 2025 Thai Massage on Harvey, Australia.</p>
+	<p>&copy; 2026 Thai Massage on Harvey, Australia.</p>
 </footer>
 
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -619,6 +630,78 @@
     };
 
     setInterval(scrollTestimonials, 3000); // Adjust the interval as needed
+
+    // Twilio WhatsApp Booking Notification
+    document.getElementById('booking-form').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        // Get form values
+        const service = document.querySelector('input[name="person1[]"]:checked')?.value || 'Not selected';
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const duration = document.getElementById('duration').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+
+        // Validate that a service is selected
+        if (service === 'Not selected') {
+            alert('Please select a service type');
+            return;
+        }
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<p style="color: blue; margin-top: 1rem;">⏳ Processing booking...</p>';
+
+        try {
+            // Send WhatsApp notification to owner via Twilio
+            const whatsappResponse = await fetch('https://send-booking-3708.twil.io/send-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    service: service,
+                    date: date,
+                    time: time,
+                    duration: duration,
+                    name: name,
+                    email: email,
+                    phone: phone
+                })
+            });
+
+            const whatsappResult = await whatsappResponse.json();
+            console.log('Twilio response:', whatsappResult);
+
+            // Also send email notification to owner
+            const formData = new FormData(this);
+            await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Show success message
+            if (whatsappResult.success) {
+                resultDiv.innerHTML =
+                    '<p style="color: green; margin-top: 1rem; font-weight: bold;">✅ Booking Confirmed!</p>';
+            } else {
+                resultDiv.innerHTML =
+                    '<p style="color: orange; margin-top: 1rem;">⚠️ Booking received. We will contact you shortly.</p>';
+            }
+
+            // Reset form after 3 seconds
+            setTimeout(() => {
+                this.reset();
+                resultDiv.innerHTML = '';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.innerHTML =
+                '<p style="color: red; margin-top: 1rem;">❌ Error: ' + error.message + '<br>Please call us at 0401 818 848.</p>';
+        }
+    });
 </script>
 </body>
 </html>
