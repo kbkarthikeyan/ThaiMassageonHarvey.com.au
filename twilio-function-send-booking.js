@@ -1,15 +1,3 @@
-/**
- * Twilio Function: Send WhatsApp Booking Notification to OWNER
- *
- * Deploy this in Twilio Console → Functions and Assets → Services
- *
- * Path: /send-booking
- *
- * Environment Variables needed in Twilio:
- * - WHATSAPP_FROM: Your Twilio WhatsApp number (e.g., whatsapp:+15077085431)
- * - OWNER_PHONE: Owner's WhatsApp number (e.g., +393495565607)
- */
-
 exports.handler = async function(context, event, callback) {
   // Enable CORS for your website
   const response = new Twilio.Response();
