@@ -37,7 +37,7 @@ exports.handler = async function(context, event, callback) {
     });
 
     // Get owner phone from environment variable
-    const ownerPhone = context.OWNER_PHONE || '+393495565607';
+    const ownerPhone = context.OWNER_PHONE;
 
     // Create WhatsApp message for OWNER (booking alert)
     const ownerMessage = `🆕 NEW BOOKING ALERT!\n\n` +
