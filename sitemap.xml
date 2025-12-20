@@ -1,28 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-   <url>
-      <loc>https://thaimassageonharvey.com.au</loc>
-      <lastmod>2024-11-15</lastmod>
-      <priority>1.0</priority>
-   </url>
-   <url>
-      <loc>https://thaimassageonharvey.com.au/#services</loc>
-      <lastmod>2024-11-15</lastmod>
-      <priority>0.8</priority>
-   </url>
-   <url>
-      <loc>https://thaimassageonharvey.com.au/#about</loc>
-      <lastmod>2024-11-15</lastmod>
-      <priority>0.8</priority>
-   </url>
-   <url>
-      <loc>https://thaimassageonharvey.com.au/#contact</loc>
-      <lastmod>2024-11-15</lastmod>
-      <priority>0.8</priority>
-   </url>
-   <url>
-      <loc>https://thaimassageonharvey.com.au/#booking</loc>
-      <lastmod>2024-11-15</lastmod>
-      <priority>1.0</priority>
-   </url>
+  <url>
+    <loc>https://thaimassageonharvey.com.au/</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
 </urlset>
