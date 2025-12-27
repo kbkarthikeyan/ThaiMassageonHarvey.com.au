@@ -196,8 +196,51 @@
 		height: auto;"
 	}
 	table {
-		width: 100%; 
+		width: 100%;
 		text-align: center;
+	}
+
+	/* Admin Panel Styles */
+	#admin-panel {
+		display: none;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: white;
+		padding: 2rem;
+		border-radius: 10px;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+		z-index: 10000;
+		max-width: 500px;
+		width: 90%;
+	}
+
+	#admin-overlay {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.5);
+		z-index: 9999;
+	}
+
+	.holiday-item {
+		background: #f0f0f0;
+		padding: 0.5rem 1rem;
+		margin: 0.5rem 0;
+		border-radius: 5px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.holiday-item button {
+		background: #ff4444;
+		padding: 0.25rem 0.75rem;
+		font-size: 0.9rem;
 	}
 	
 	button:hover, .button:hover {
@@ -627,9 +670,397 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
 	<p>&copy; 2026 Thai Massage on Harvey, Australia.</p>
 </footer>
 
+<!-- Admin Panel (Hidden) -->
+<div id="admin-overlay"></div>
+<div id="admin-panel">
+	<div id="admin-login">
+		<h2>Admin Access</h2>
+		<input type="password" id="admin-password" placeholder="Enter password" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+		<button onclick="adminLogin()" style="width: 100%;">Login</button>
+		<button onclick="closeAdmin()" style="width: 100%; margin-top: 0.5rem; background: #666;">Cancel</button>
+	</div>
+
+	<div id="admin-content" style="display: none;">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+			<h2 style="margin: 0;">Holiday Management</h2>
+			<button onclick="showChangePassword()" style="background: #3C1C3C; padding: 0.4rem 0.8rem; font-size: 0.9rem;">Change Password</button>
+		</div>
+		<div style="margin: 1rem 0;">
+			<label for="holiday-from">From Date:</label>
+			<input type="date" id="holiday-from" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+
+			<label for="holiday-to">To Date:</label>
+			<input type="date" id="holiday-to" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+
+			<button onclick="addHoliday()" style="width: 100%;">Add Holiday Period</button>
+		</div>
+
+		<h3>Current Holiday Periods:</h3>
+		<div id="holiday-list" style="max-height: 300px; overflow-y: auto;">
+			<!-- Holidays will be listed here -->
+		</div>
+
+		<button onclick="closeAdmin()" style="width: 100%; margin-top: 1rem; background: #666;">Close</button>
+	</div>
+
+	<div id="change-password-content" style="display: none;">
+		<h2>Change Password</h2>
+		<div style="margin: 1rem 0;">
+			<label for="current-password">Current Password:</label>
+			<input type="password" id="current-password" placeholder="Enter current password" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+
+			<label for="new-password">New Password:</label>
+			<input type="password" id="new-password" placeholder="Enter new password" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+
+			<label for="confirm-password">Confirm New Password:</label>
+			<input type="password" id="confirm-password" placeholder="Confirm new password" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+
+			<button onclick="changePassword()" style="width: 100%; margin-top: 1rem;">Update Password</button>
+			<button onclick="cancelChangePassword()" style="width: 100%; margin-top: 0.5rem; background: #666;">Cancel</button>
+		</div>
+	</div>
+</div>
+
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
+    // Admin Panel Functions
+    // SHA-256 hash of the default password
+    const DEFAULT_PASSWORD_HASH = 'b98cfb190c77e07a6f662ebb64f30ceec4f2950b28d239091c8e21cf290abf40';
+
+    // JSONBin.io Configuration
+    const JSONBIN_BIN_ID = '694f804943b1c97be907b46d';
+    const JSONBIN_API_KEY = '$2a$10$ZACGNT.4f9Aq4eFqI6LwBOAhGN2wBnBP5dzevDUy4c0ZGhO/G.vLS';
+
+    // Function to hash password using SHA-256
+    async function hashPassword(password) {
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
+    // Fetch data from JSONBin (holidays and password hash)
+    async function getJSONBinData() {
+        if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE' || JSONBIN_API_KEY === 'YOUR_API_KEY_HERE') {
+            console.warn('JSONBin not configured, using localStorage as fallback');
+            return null;
+        }
+
+        try {
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                headers: {
+                    'X-Master-Key': JSONBIN_API_KEY
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data from JSONBin');
+            }
+
+            const data = await response.json();
+            return data.record;
+        } catch (error) {
+            console.error('Error fetching from JSONBin:', error);
+            return null;
+        }
+    }
+
+    // Save data to JSONBin (holidays and password hash)
+    async function saveJSONBinData(data) {
+        if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE' || JSONBIN_API_KEY === 'YOUR_API_KEY_HERE') {
+            console.warn('JSONBin not configured, using localStorage as fallback');
+            return false;
+        }
+
+        try {
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save data to JSONBin');
+            }
+
+            console.log('Data saved to JSONBin successfully');
+            return true;
+        } catch (error) {
+            console.error('Error saving to JSONBin:', error);
+            return false;
+        }
+    }
+
+    // Get current password hash (from JSONBin or default)
+    async function getPasswordHash() {
+        const data = await getJSONBinData();
+        console.log('=== PASSWORD HASH DEBUG ===');
+        console.log('Full JSONBin data:', JSON.stringify(data, null, 2));
+        console.log('Password hash from JSONBin:', data?.passwordHash);
+        console.log('Default password hash:', DEFAULT_PASSWORD_HASH);
+
+        if (data && data.passwordHash) {
+            console.log('Using JSONBin password hash');
+            return data.passwordHash;
+        }
+        console.log('Using default password hash');
+        return DEFAULT_PASSWORD_HASH;
+    }
+
+    // Save new password hash to JSONBin
+    async function savePasswordHash(hash) {
+        const data = await getJSONBinData() || { holidays: [] };
+        data.passwordHash = hash;
+        const saved = await saveJSONBinData(data);
+
+        if (!saved) {
+            // Fallback to localStorage
+            localStorage.setItem('adminPasswordHash', hash);
+            alert('Warning: Password saved locally only. Please check JSONBin configuration.');
+        }
+    }
+
+    // Fetch holidays from JSONBin
+    async function getHolidays() {
+        const data = await getJSONBinData();
+        if (data && data.holidays) {
+            return data.holidays;
+        }
+
+        // Fallback to localStorage
+        const holidays = localStorage.getItem('holidays');
+        return holidays ? JSON.parse(holidays) : [];
+    }
+
+    // Save holidays to JSONBin
+    async function saveHolidays(holidays) {
+        const data = await getJSONBinData() || {};
+        data.holidays = holidays;
+
+        // Preserve password hash if it exists
+        if (!data.passwordHash) {
+            data.passwordHash = DEFAULT_PASSWORD_HASH;
+        }
+
+        const saved = await saveJSONBinData(data);
+
+        if (!saved) {
+            // Fallback to localStorage
+            localStorage.setItem('holidays', JSON.stringify(holidays));
+            alert('Warning: Changes saved locally only. Please check JSONBin configuration.');
+        }
+    }
+
+    function showAdmin() {
+        document.getElementById('admin-overlay').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'block';
+    }
+
+    function closeAdmin() {
+        document.getElementById('admin-overlay').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('admin-login').style.display = 'block';
+        document.getElementById('admin-content').style.display = 'none';
+        document.getElementById('admin-password').value = '';
+        window.location.hash = '';
+    }
+
+    async function adminLogin() {
+        const password = document.getElementById('admin-password').value;
+        const hashedInput = await hashPassword(password);
+        const currentHash = await getPasswordHash();
+
+        console.log('Entered password hash:', hashedInput);
+        console.log('Stored password hash:', currentHash);
+        console.log('Hashes match:', hashedInput === currentHash);
+
+        if (hashedInput === currentHash) {
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            await displayHolidays();
+        } else {
+            alert('Incorrect password. Check browser console (F12) for debug info.');
+        }
+    }
+
+    function showChangePassword() {
+        document.getElementById('admin-content').style.display = 'none';
+        document.getElementById('change-password-content').style.display = 'block';
+    }
+
+    function cancelChangePassword() {
+        document.getElementById('change-password-content').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        // Clear password fields
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+    }
+
+    async function changePassword() {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        // Validate inputs
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // Verify current password
+        const currentHash = await hashPassword(currentPassword);
+        const storedHash = await getPasswordHash();
+        if (currentHash !== storedHash) {
+            alert('Current password is incorrect');
+            return;
+        }
+
+        // Validate new password length
+        if (newPassword.length < 6) {
+            alert('New password must be at least 6 characters long');
+            return;
+        }
+
+        // Confirm passwords match
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+
+        // Hash and save new password
+        const newHash = await hashPassword(newPassword);
+        await savePasswordHash(newHash);
+
+        alert('Password changed successfully!');
+        cancelChangePassword();
+    }
+
+    async function addHoliday() {
+        const fromInput = document.getElementById('holiday-from');
+        const toInput = document.getElementById('holiday-to');
+        const fromDate = fromInput.value;
+        const toDate = toInput.value;
+
+        if (!fromDate || !toDate) {
+            alert('Please select both from and to dates');
+            return;
+        }
+
+        if (fromDate > toDate) {
+            alert('From date must be before or equal to To date');
+            return;
+        }
+
+        const holidays = await getHolidays();
+        const newHoliday = { from: fromDate, to: toDate };
+
+        holidays.push(newHoliday);
+        holidays.sort((a, b) => a.from.localeCompare(b.from));
+        await saveHolidays(holidays);
+        await displayHolidays();
+
+        fromInput.value = '';
+        toInput.value = '';
+    }
+
+    async function removeHoliday(index) {
+        if (confirm('Remove this holiday period?')) {
+            let holidays = await getHolidays();
+            holidays.splice(index, 1);
+            await saveHolidays(holidays);
+            await displayHolidays();
+        }
+    }
+
+    async function displayHolidays() {
+        const holidays = await getHolidays();
+        const listDiv = document.getElementById('holiday-list');
+
+        if (holidays.length === 0) {
+            listDiv.innerHTML = '<p style="text-align: center; color: #666;">No holiday periods set</p>';
+            return;
+        }
+
+        listDiv.innerHTML = holidays.map((holiday, index) => {
+            const fromObj = new Date(holiday.from + 'T00:00:00');
+            const toObj = new Date(holiday.to + 'T00:00:00');
+
+            const fromFormatted = fromObj.toLocaleDateString('en-AU', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const toFormatted = toObj.toLocaleDateString('en-AU', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const dateDisplay = holiday.from === holiday.to
+                ? fromFormatted
+                : `${fromFormatted} - ${toFormatted}`;
+
+            return `
+                <div class="holiday-item">
+                    <span>${dateDisplay}</span>
+                    <button onclick="removeHoliday(${index})">Remove</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function isHoliday(date) {
+        const holidays = await getHolidays();
+        console.log('=== HOLIDAY CHECK DEBUG ===');
+        console.log('Checking date:', date);
+        console.log('All holidays:', holidays);
+
+        const isBlocked = holidays.some(holiday => {
+            const inRange = date >= holiday.from && date <= holiday.to;
+            console.log(`Checking against holiday: ${holiday.from} to ${holiday.to}`);
+            console.log(`  date >= from: ${date} >= ${holiday.from} = ${date >= holiday.from}`);
+            console.log(`  date <= to: ${date} <= ${holiday.to} = ${date <= holiday.to}`);
+            console.log(`  In range: ${inRange}`);
+            return inRange;
+        });
+
+        console.log('Is date blocked?', isBlocked);
+        return isBlocked;
+    }
+
+    // Check URL hash on load
+    window.addEventListener('load', function() {
+        if (window.location.hash === '#admin') {
+            showAdmin();
+        }
+    });
+
+    // Check URL hash changes
+    window.addEventListener('hashchange', function() {
+        if (window.location.hash === '#admin') {
+            showAdmin();
+        }
+    });
+
+    // Close admin panel when clicking overlay
+    document.getElementById('admin-overlay').addEventListener('click', closeAdmin);
+
+    // Allow Enter key to login
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('admin-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adminLogin();
+            }
+        });
+    });
+
     let scrollIndex = 0;
     const scrollTestimonials = () => {
         const container = document.querySelector('.testimonial-container');
@@ -665,6 +1096,13 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
         // Validate that a service is selected
         if (service === 'Not selected') {
             alert('Please select a service type');
+            return;
+        }
+
+        // Check if selected date is a holiday
+        if (await isHoliday(date)) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p style="color: red; margin-top: 1rem; font-weight: bold;">❌ Sorry, we are closed on this date. Please select another date.</p>';
             return;
         }
 
