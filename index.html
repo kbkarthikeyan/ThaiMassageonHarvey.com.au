@@ -1022,7 +1022,7 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
         console.log('Checking date:', date);
         console.log('All holidays:', holidays);
 
-        const isBlocked = holidays.some(holiday => {
+        const blockedHoliday = holidays.find(holiday => {
             const inRange = date >= holiday.from && date <= holiday.to;
             console.log(`Checking against holiday: ${holiday.from} to ${holiday.to}`);
             console.log(`  date >= from: ${date} >= ${holiday.from} = ${date >= holiday.from}`);
@@ -1031,8 +1031,8 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
             return inRange;
         });
 
-        console.log('Is date blocked?', isBlocked);
-        return isBlocked;
+        console.log('Is date blocked?', !!blockedHoliday);
+        return blockedHoliday; // Returns the holiday object if blocked, or undefined if not
     }
 
     // Check URL hash on load
@@ -1059,6 +1059,15 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
                 adminLogin();
             }
         });
+
+        // Set minimum date to today for booking
+        const dateInput = document.getElementById('date');
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDate = `${yyyy}-${mm}-${dd}`;
+        dateInput.setAttribute('min', minDate);
     });
 
     let scrollIndex = 0;
@@ -1099,10 +1108,28 @@ Highly recommended for anyone needing dealing with muscle tension. Definitely a 
             return;
         }
 
-        // Check if selected date is a holiday
-        if (await isHoliday(date)) {
+        // Check if date is in the past
+        const selectedDate = new Date(date + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+
+        if (selectedDate < today) {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<p style="color: red; margin-top: 1rem; font-weight: bold;">❌ Sorry, we are closed on this date. Please select another date.</p>';
+            resultDiv.innerHTML = '<p style="color: red; margin-top: 1rem; font-weight: bold;">❌ Appointments are to be made for today or the future. Please select a valid date.</p>';
+            return;
+        }
+
+        // Check if selected date is a holiday
+        const holidayPeriod = await isHoliday(date);
+        if (holidayPeriod) {
+            const resultDiv = document.getElementById('result');
+            const endDate = new Date(holidayPeriod.to + 'T00:00:00');
+            const formattedEndDate = endDate.toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            resultDiv.innerHTML = `<p style="color: red; margin-top: 1rem; font-weight: bold;">❌ Sorry, we are closed until ${formattedEndDate}. Please try a date after that.</p>`;
             return;
         }
 
